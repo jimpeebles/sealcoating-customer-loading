@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+
+    <style>
+      body {
+        font-family: Arial;
+        font-weight: bold;
+        margin-top: 30px;
+        margin-left: 30px;
+      }
+
+      p {
+        padding-top: 15px;
+        padding-bottom: 15px;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
+    />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+    <script>
+      $(function() {
+        google.script.run
+          .withSuccessHandler(buildTagList)
+          .getMenuListFromSheet();
+      });
+
+      function buildTagList(availableCustomers) {
+        $("#customers").autocomplete({
+          source: availableCustomers,
+
+          select: function(event, ui) {
+            return false;
+          },
+
+          select: function(event, ui) {
+            $(this).val(ui.item ? ui.item : " ");
+          },
+
+          change: function(event, ui) {
+            if (!ui.item) {
+              this.value = "";
+            }
+            //else { Return your label here }
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div class="ui-widget">
+      <p>Date: <input type="date" id="datepicker" /></p>
+      <p>
+        <label for="tags">Customer: </label>
+        <input id="customers" />
+      </p>
+      <p>
+        Product:
+        <select id="product" name="product">
+          <option>Coal Tar</option>
+          <option>MS</option>
+          <option>LV</option>
+        </select>
+      </p>
+      <p>
+        Gallons:
+        <input type="number" name="gallons" id="gallons" />
+      </p>
+      <p>
+        Water:
+        <input type="number" name="water" id="water" /><br /><br />
+        <input
+          id="calc"
+          type="button"
+          value="Calculate Dilution"
+          onclick="calculateDilution();"
+        /><br /><br />
+        Add <span id="low"> </span> to
+        <span id="high"> </span> gallons.<br /><br />
+      </p>
+      <p>
+        Sand:
+        <input type="number" name="sand" id="sand" />
+      </p>
+      <p>
+        Meter Total:
+        <input type="number" name="meter" id="meter" />
+      </p>
+      <p>
+        <input
+          id="submit"
+          type="button"
+          value="Submit"
+          onclick="SubmitLoad();"
+        />
+      </p>
+    </div>
+
+    <script>
+      function calculateDilution() {
+        var selectedProduct = document.getElementById("product").value;
+        var gallons = document.getElementById("gallons").value;
+        var lowEnd = null;
+        var highEnd = null;
+
+        switch (selectedProduct) {
+          case "Coal Tar":
+            lowEnd = gallons * 0.3;
+            highEnd = gallons * 0.4;
+            document.getElementById("low").innerHTML = lowEnd;
+            document.getElementById("high").innerHTML = highEnd;
+            break;
+
+          case "MS":
+            lowEnd = gallons * 0.2;
+            highEnd = gallons * 0.25;
+            document.getElementById("low").innerHTML = lowEnd;
+            document.getElementById("high").innerHTML = highEnd;
+            break;
+
+          case "LV":
+            lowEnd = gallons * 0.2;
+            highEnd = gallons * 0.3;
+            document.getElementById("low").innerHTML = lowEnd;
+            document.getElementById("high").innerHTML = highEnd;
+            break;
+        }
+      }
+    </script>
+    <script>
+      function onSuccess(message) {
+        alert(message);
+      }
+
+      function SubmitLoad() {
+        var mDate = document.getElementById("datepicker").value;
+        var mCustomer = document.getElementById("customers").value;
+        var mProduct = document.getElementById("product").value;
+        var mGallons = document.getElementById("gallons").value;
+        var mWater = document.getElementById("water").value;
+        var mSand = document.getElementById("sand").value;
+        var mMeter = document.getElementById("meter").value;
+        google.script.run
+          .withSuccessHandler(onSuccess)
+          .AddLoad(mDate, mCustomer, mProduct, mGallons, mWater, mSand, mMeter);
+
+        document.getElementById("gallons").value = "";
+        document.getElementById("water").value = "";
+        document.getElementById("sand").value = "";
+        document.getElementById("meter").value = "";
+      }
+    </script>
+  </body>
+</html>
